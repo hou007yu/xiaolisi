@@ -1,0 +1,283 @@
+/* 全局设置 */
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+    body {
+      margin: 0; 
+      height: 100vh; 
+      background-image: url('./img/bg.jpg'); 
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+      font-family: '楷体', sans-serif; }
+    
+
+    .corner-avatar {
+      position: fixed;
+      top: 4px;
+      left: 10px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;               /* 圆形；改成 12px 就是圆角方形 */
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.85);
+      box-shadow: 0 6px 18px rgba(255,107,129,0.35);
+      z-index: 50;
+      opacity: 0.9;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .corner-avatar:hover {
+      transform: scale(1.06);
+      box-shadow: 0 8px 24px rgba(255,107,129,0.55);
+    }
+
+    /* Q版人物固定定位 */
+    .character {
+      position: fixed;
+      bottom: 30px;
+      width: 180px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      animation: float 2.5s ease-in-out infinite;
+      z-index: 100;
+    }
+    .left { left: 30px; }
+    .right { right: 30px; animation-delay: 0.5s; }
+    
+    /* 浮动动画 */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    /* 悬停放大 */
+    .character:hover { transform: scale(1.08); }
+
+    
+/* 对话气泡 */
+.bubble {
+  position: fixed;
+  bottom: 200px;
+  background: rgba(0, 0, 0, 0.75); /* 半透明深黑色背景 */
+  color: white;
+  padding: 15px 25px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  font-size: 18px;
+  max-width: 300px;
+  animation: popIn 0.3s ease;
+  z-index: 1000; 
+}
+
+/* 左边对话气泡 */
+.bubble-left { left: 40px; }
+.bubble-left::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 40px;
+  border: 12px solid transparent; 
+  border-top-color: rgba(0, 0, 0, 0.75); /* 颜色和气泡背景完全一致 */
+  border-bottom: 0; /* 去掉底边，只留上面 */
+}
+
+/* 右边对话气泡 */
+.bubble-right { right: 40px; }
+.bubble-right::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  right: 40px;
+  border: 12px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.75);
+  border-bottom: 0; 
+}
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    /* 中间按钮 */
+    .center-btn {
+      position: absolute;
+      top: 67%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 14px 55px;
+      font-size: 26px;
+     background-image: url(./img/按钮背景.png);
+     background-size: cover;      
+     background-position: center; 
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255,107,129,0.1);
+      transition: all 0.3s;
+      font-family: '楷体', sans-serif;
+      letter-spacing: 4px;
+      z-index: 10;
+    }
+
+     /* 按钮边框渐变到透明 */
+    .center-btn:hover {
+      transform: translate(-50%, -50%) scale(1.05);
+      box-shadow: 0 8px 30px rgba(255,107,129,0.6);
+    }
+
+    
+    /* 背景飘落的小照片 */
+.heart { 
+  position: fixed; 
+  top: -150px;
+  pointer-events: none; 
+  box-shadow: 0 6px 15px rgba(0,0,0,0.9); 
+  object-fit: cover;        /* 保证照片内容不被拉伸变形 */
+  z-index: 1;             
+  transform: rotate(0deg); 
+}
+
+    /* ===== "大家好"  ===== */
+    .center-text {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      color: #f7f1f1;
+      font-size: 34px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.8);
+      z-index: 200;
+      pointer-events: none;
+      opacity: 0;
+      animation: textZoomOut 2s ease forwards; /* 2秒内变大消失 */
+    }
+
+    /* 2秒内变大并消失的动画 */
+    @keyframes textZoomOut {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+      20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } /* 0.4秒时最大最清晰 */
+      80%  { opacity: 0.8; transform: translate(-50%, -50%) scale(1.6); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(2.2); } /* 2秒时变大并消失 */
+    }
+
+/* ===== 顶部导航栏 ===== */
+.top-nav{
+  position: fixed;
+  top: 22px;
+  left: 0;
+  width: 100%;
+  padding: 24px 32px;
+  display: flex;
+  justify-content:flex-end;
+  font-family: system-ui, sans-serif;
+  align-items: center;
+  z-index: 99;
+}
+.nav-menu{
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  flex-shrink: 0;
+}
+.nav-menu li{
+    color: #b5aade;
+    font-size: 16px;
+    white-space: nowrap;
+    /* 文字不换行 */
+    text-decoration: none;
+    list-style: none;
+    cursor: pointer;
+}
+.nav-menu li:hover{
+  color: #bc0cff;
+}
+/* 滚动条 */
+.marquee-bar {
+  position: fixed;
+  top: 5px;
+  left: 0;
+  width: 100%;
+  height: 22px;                  
+  /* background: linear-gradient(90deg, #ff8da1, #ffb3c6, #ff8da1); */
+  overflow: hidden;
+  z-index: 100;                  /* 比导航栏高，压在上面 */
+  display: flex;
+  align-items: center;
+  /* box-shadow: 0 2px 8px rgba(255,107,129,0.3); */
+}
+
+.marquee-text {
+  white-space: nowrap;
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 2px;
+  padding-left: 100%;            /* 从右边外面开始 */
+  animation: marquee 20s linear infinite;
+  font-family: '楷体', sans-serif;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* ===== 简介弹窗盒子 ===== */
+.intro-box {
+  position: fixed;
+  top: 100px; 
+  right: 60px;                      
+  left: auto;
+  transform: translateY(-20px);
+  width: min(90vw, 600px);
+  padding: 24px 20px;
+  background: linear-gradient(135deg, #ffb347, #ff8c42);  /* 黄橙渐变 */
+  color: #fff;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(255, 140, 66, 0.5);
+  font-family: '楷体', sans-serif;
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+/* 显示状态 */
+.intro-box.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform:  translateY(0);
+}
+
+.intro-box h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.intro-box p {
+  margin: 8px 0;
+  font-size: 16px;
+  line-height: 1.7;
+  opacity: 0.95;
+}
+
+/* 关闭按钮 */
+.intro-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.intro-close:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}

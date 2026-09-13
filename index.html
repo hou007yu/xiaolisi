@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="./reset.css">
+    <link rel="stylesheet" href="./index.css">
+    <title>小力士</title>
+</head>
+<body>
+  
+  <img class="corner-avatar" src="img/zuoshangjiao.jpg" alt="小力士" id="cornerAvatar">
+  <!-- Q版人物 -->
+  <img class="character left" src="img/lei.png" alt="雷淞然" id="lei">
+  <img class="character right" src="img/zhang.png" alt="张呈" id="zhang">
+
+ 
+  <!-- 中间按钮 -->
+  <a href="/home">
+    <button class="center-btn">💕 进入小力士宇宙 💕</button>
+  </a>
+
+  <script>
+    // 对话库
+    const leiWords = [
+      '雷淞然：大家好，我是雷淞然',
+      '雷淞然：在被否定时，沉下心钻研',
+      '雷淞然：好剧本永远难写，好心情能抗事',
+      '雷淞然：及时行乐 所有事情都没有想象的那么重要'
+    ];
+    const zhangWords = [
+      '张呈：大家好，我是张呈',
+      '张呈：因为我们俩其实共苦过嘛，所以说以后也想同甘',
+      '张呈：这个本子如果是张呈跟雷淞然演就更好了',
+     '张呈：放弃是比坚持更难的东西'
+    ];
+
+    let leiIndex = 0; 
+    let zhangIndex = 0;
+
+    // 显示气泡
+    function showBubble(text, side) {
+      document.querySelectorAll('.bubble').forEach(el => el.remove());
+      let bubble = document.createElement('div');
+      bubble.className = `bubble bubble-${side}`;
+      bubble.textContent = text;
+      document.body.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 3500);
+    }
+
+    // 点击人物事件
+    document.getElementById('lei').addEventListener('click', function() {
+      // 改用索引取值，保证顺序轮换，不会重复
+      const text = leiWords[leiIndex % leiWords.length]; 
+      leiIndex++; // 每次点击索引+1
+      showBubble(text, 'left');
+    });
+    document.getElementById('zhang').addEventListener('click', function() {
+      // 改用索引取值，保证顺序轮换，不会重复
+      const text = zhangWords[zhangIndex % zhangWords.length];
+      zhangIndex++; // 每次点击索引+1
+      showBubble(text, 'right');
+    });
+
+   
+  
+// ==================== 背景飘落照片 ====================
+
+// 1. 照片
+const photos = [
+  'img/photo1.jpg', 
+  'img/photo2.jpg', 
+  'img/photo3.jpg', 
+  'img/photo4.jpg', 
+  'img/photo5.jpg', 
+  'img/photo6.jpg', 
+  'img/photo7.jpg', 
+  'img/photo8.jpg', 
+  'img/photo9.jpg', 
+  'img/photo10.jpg', 
+  'img/photo11.jpg', 
+  'img/photo12.jpg', 
+  'img/photo13.jpg', 
+  'img/photo14.jpg', 
+  'img/photo15.jpg', 
+  'img/photo16.jpg', 
+  'img/photo17.jpg', 
+  'img/photo18.jpg', 
+  'img/photo19.jpg', 
+  'img/photo20.jpg', 
+  'img/photo21.jpg', 
+  'img/zuoshangjiao.jpg',
+  'img/22.jpg',
+  'img/23.jpg',
+  'img/24.jpg',
+  'img/25.jpg',
+];
+
+// 2. 洗牌算法：打乱数组顺序，保证抽完一轮才重来
+function shuffle(array) {
+  let currentIndex = array.length, randomIndex;
+  while (currentIndex != 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    // Math.floor向下取整
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
+
+// 3. 设置洗牌池
+let photoPool = shuffle([...photos]); // 复制一份进行洗牌，不打乱原始数组
+let poolIndex = 0; // 当前抽到第几张
+
+// 4. 记录最近生成照片的 left 值，用于防堆叠
+let lastLeft = -999; 
+setInterval(() => {
+  // === 防重复逻辑：如果这一圈播完，重新洗牌 ===
+  if (poolIndex >= photoPool.length) {
+    photoPool = shuffle([...photos]); // 重新洗牌
+    poolIndex = 0; // 重新从0开始
+  }
+
+  // 从洗好的牌堆里取下一张
+  let img = document.createElement('img');
+  img.className = 'heart';
+  img.src = photoPool[poolIndex];
+  poolIndex++; // 指针向前移动
+
+  // 设置尺寸（大尺寸：200px - 270px）
+  let randomSize = 200 + Math.random() * 70; 
+  img.style.width = randomSize + 'px';
+  img.style.height = 'auto';
+  img.style.opacity = '0.9';
+
+  // === 防堆叠逻辑：避开上一张照片的位置 ===
+  let minLeft = 10; // 左边界
+  let maxLeft = window.innerWidth - randomSize - 10; // 右边界
+  let randomLeft;
+  let attempts = 0;
+  do {
+    randomLeft = minLeft + Math.random() * (maxLeft - minLeft);
+    attempts++;
+    // 检查与上一张照片(高度200左右)是否重叠。如果距离太近（小于250px），重新随机。
+    // 如果尝试了10次还是太近，就强制错开，避免死循环
+  } while (Math.abs(randomLeft - lastLeft) < randomSize + 20 && attempts < 10);
+
+  lastLeft = randomLeft; // 记录当前照片的位置，作为下一张的参考
+  img.style.left = randomLeft + 'px';
+  img.style.top = '-150px'; // 从屏幕上方开始下落
+  document.body.appendChild(img);
+
+  // === 纯直线下落动画 ===
+  let fall = setInterval(() => {
+    let top = parseFloat(img.style.top);
+    if (top > window.innerHeight) {
+      clearInterval(fall);
+      img.remove(); // 掉出屏幕就删除
+    } else {
+      img.style.top = top + 3 + 'px'; 
+    }
+  }, 30);
+}, 600); 
+
+     // ===== 双击空白出现正中央“小力士”文字，2秒变大消失 =====
+    let textTimer = null; 
+    document.addEventListener('dblclick', function(e) {
+      // 如果点击的是人物、按钮、原有文字，不触发
+      if (e.target.closest('.character') || e.target.closest('.center-btn') || e.target.closest('.center-text')) {
+        return;
+      }
+      // 如果有旧文字先删掉，防止文字叠在一起
+      const existingText = document.querySelector('.center-text');
+      if (existingText) {
+        existingText.remove();
+        clearTimeout(textTimer);
+      }
+      
+      // 创建正中央文字
+      let text = document.createElement('div');
+      text.className = 'center-text';
+      text.textContent = '大家好，我们是小力士！ 💫';
+      document.body.appendChild(text);
+      // 2秒动画结束后，从页面彻底移除文字元素
+      textTimer = setTimeout(() => {
+        if (text.parentNode) {
+          text.remove();
+          textTimer = null;
+        }
+      }, 2000);
+    });
+  </script>
+
+  <!-- 顶部滚动字幕 -->
+  <div class="marquee-bar">
+    <div class="marquee-text">
+      点击人物有惊喜，双击空白处有惊喜⭐···图源致谢：小红书【补要熬椰了、HUOYU火鱼】（如有遗漏的老师请私信我，介意请联系我，我马上删！以上内容为不完全统计，欢迎补充）
+    </div>
+  </div>
+
+  <!-- 导航栏 -->
+   <div class="top-nav">
+    <div class="nav-menu">     
+      <li id="introBtn">简介</li >       
+      <li id="honorBtn">荣誉</li >      
+      <li id="bizBtn">商务</li >       
+      <li id="coopBtn">合作</li> 
+      <li id="transformBtn">变换形态</li >      
+    </div>
+  </div>
+
+  <!-- 简介弹窗盒子 -->
+  <div class="intro-box" id="introBox">
+    <span class="intro-close" id="introClose">✕</span>
+    <h3>💫 关于我们</h3>
+    <p>  小力士是系列综艺《喜人奇妙夜》中的喜人小队，由张呈、雷淞然组成。 
+    张呈1997年1月31日出生于广东湛江，毕业于中央戏剧学院音乐剧系；雷淞然1998年6月28日出生于辽宁沈阳，毕业于中央戏剧学院表演系，两人均于2022年参加《一年一度喜剧大赛》第二季。 
+    该组合基于两人九年友谊组建，组合名称源于两人在节目采访中自我调侃曾想健身成为“大力士”但未能坚持。
+    张呈在《喜人奇妙夜第二季》筹备期间多次邀请雷淞然合作，最终在节目正式组队。2025年12月，他们凭借《旧警察故事》《领养日》《乐园停业那一天》等多样化喜剧作品获得该季最佳喜剧小队冠军。
+    节目中两人尝试了人性喜剧、无厘头漫才等风格，作品常以小人物的坚持为主题，结合浪漫主义元素收尾。</p>
+  </div>
+  <!-- ===== 简介点击脚本（原有，不动） ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const btn   = document.getElementById('introBtn');
+  const box   = document.getElementById('introBox');
+  const close = document.getElementById('introClose');
+
+  if (!btn || !box || !close) {
+    console.warn('❌ 有元素没找到:', { btn, box, close });
+    return;
+  }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    box.classList.add('show');
+  });
+
+  close.addEventListener('click', function (e) {
+    e.stopPropagation();
+    box.classList.remove('show');
+  });
+
+  box.addEventListener('mouseleave', function () {
+    box.classList.remove('show');
+  });
+});
+</script>
+
+<!-- ===== 荣誉 / 商务 / 合作 复用同一盒子 ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const box = document.getElementById('introBox');
+  if (!box) return;
+
+  const contents = {
+    honorBtn: {
+      title: '🏆 荣誉墙',
+      lines: [
+        '最佳喜剧小队TOP1',
+      ]
+    },
+    bizBtn: {
+      title: '💼 商务合作',
+      lines: [
+        '问界M7、FILA FUSION、力士、周黑鸭、伊利牧场、唯品会、美团、珀莱雅、华为',
+        '工作邀约请联络：oacaofficial@163.com    小雷的邮箱没找到，请联络米未传媒',
+      ]
+    },
+    coopBtn: {
+      title: '🤝 合作',
+      lines: [
+        '雷淞然 × 张呈',
+        '江苏卫视《超时空父子》',
+        '央视元宵晚会《一张票》',
+        '吉林春晚《大诗人请坐》',
+        '《大唐妖探》配音：阿萨、狄少',
+        '小力出奇迹',
+        '小力士旅行日记'
+      ]
+    }
+  };
+
+  function renderContent(key) {
+    const data = contents[key];
+    if (!data) return;
+    box.innerHTML = `
+      <span class="intro-close" id="introClose">✕</span>
+      <h3>${data.title}</h3>
+      ${data.lines.map(t => `<p>${t}</p>`).join('')}
+    `;
+    const close = box.querySelector('#introClose');
+    if (close) {
+      close.addEventListener('click', function (e) {
+        e.stopPropagation();
+        box.classList.remove('show');
+      });
+    }
+  }
+
+  Object.keys(contents).forEach(function (id) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      renderContent(id);
+      box.classList.add('show');
+    });
+  });
+
+  box.addEventListener('mouseleave', function () {
+    box.classList.remove('show');
+  });
+});
+</script>
+  <div class="nav"></div>
+  <div class="nav"></div>
+  <div class="nav"></div>
+
+   <!-- "变换形态"切换Q版人物图像  -->
+  <script>
+  (function() {
+    // 形态库
+    const forms = [
+      { lei: 'img/lei.png',     zhang: 'img/zhang.png'     },  // 原始形态
+      { lei: 'img/lei2.jpg',    zhang: 'img/zhang2.jpg'    },  // 形态2
+      { lei: 'img/lei3.jpg',    zhang: 'img/zhang3.jpg'    }   // 形态3（可继续加）
+    ];
+
+    let currentForm = 0;  // 当前形态索引
+    const btn = document.getElementById('transformBtn');
+    const leiImg = document.getElementById('lei');
+    const zhangImg = document.getElementById('zhang');
+
+    if (btn && leiImg && zhangImg) {
+      btn.addEventListener('click', function() {
+        // 切到下一个形态（循环）
+        currentForm = (currentForm + 1) % forms.length;
+        // 加个小动画：先缩小再换图
+        leiImg.style.transform = 'scale(0.6)';
+        zhangImg.style.transform = 'scale(0.6)';
+        setTimeout(() => {
+          leiImg.src = forms[currentForm].lei;
+          zhangImg.src = forms[currentForm].zhang;
+          // 恢复
+          leiImg.style.transform = '';
+          zhangImg.style.transform = '';
+        }, 220);
+      });
+      // 让鼠标变成手型，提示可点击
+      btn.style.cursor = 'pointer';
+    }
+  })();
+  </script>
+
+</body>
+</html>
