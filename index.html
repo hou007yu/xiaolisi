@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./reset.css">
     <link rel="stylesheet" href="./index.css">
     <title>小力士</title>
@@ -126,7 +127,10 @@ setInterval(() => {
   poolIndex++; // 指针向前移动
 
   // 设置尺寸（大尺寸：200px - 270px）
-  let randomSize = 200 + Math.random() * 70; 
+  // 设置尺寸：手机端缩小，电脑端保持原样
+  let randomSize = window.innerWidth <= 768
+    ? 80 + Math.random() * 40      // 手机：80~120px
+    : 200 + Math.random() * 70;    // 电脑：200~270px
   img.style.width = randomSize + 'px';
   img.style.height = 'auto';
   img.style.opacity = '0.9';
